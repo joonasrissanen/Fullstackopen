@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios';
+import { getAll, addPerson, deletePerson, updatePerson } from './persons';
 
 const PersonForm = ({ name, number, handleNameChange, handleNumberChange, submitNewPerson}) => {
   return (
@@ -15,9 +15,16 @@ const PersonForm = ({ name, number, handleNameChange, handleNumberChange, submit
   );
 };
 
-const Persons = ({ persons }) => {
+const Persons = ({ persons, deletePerson }) => {
   return (
-    persons.map(person => <p key={person.name}>{person.name} {person.number}</p>)
+    persons.map(person => {
+      return (
+        <div key={person.name}>
+          {person.name} {person.number}
+          <button onClick={() => deletePerson(person)}>delete</button>
+        </div>
+      )
+    })
   );
 };
 
@@ -37,9 +44,7 @@ const App = () => {
   const [shownPersons, setShownPersons] = useState(persons);
 
   useEffect(() => {
-    axios.get('http://localhost:3001/persons').then((result) => {
-      setPersons(result.data);
-    });
+    getAll().then(res => setPersons(res.data));
   }, []);
 
   useEffect(() => {
@@ -59,7 +64,7 @@ const App = () => {
   };
 
   const handleNameChange = (event) => {
-      event.preventDefault();
+    event.preventDefault();
     setNewName(event.target.value);
   };
 
@@ -70,12 +75,36 @@ const App = () => {
 
   const submitNewPerson = (event) => {
     event.preventDefault();
-    if (persons.map(person => person.name).includes(newName)) {
-      alert(`${newName} is already added to phonebook`);
+    if (persons.map(person => person.name.toLowerCase()).includes(newName.toLowerCase())) {
+      if(window.confirm(`${newName} is already added to phonebook. Replace the old number with a new one?`)) {
+        const oldPerson = persons.find(p => p.name.toLowerCase() === newName.toLowerCase());
+        updatePerson(oldPerson.id, { ...oldPerson, number: newNumber}).then(res => {
+          setPersons(persons.map(p => p.id === oldPerson.id ? res.data : p));
+          setNewName('');
+          setNewNumber('');
+        });
+      }
     } else if (newName !== '' && newNumber !== '') {
-      setPersons([...persons, { name: newName, number: newNumber }]);
-      setNewName('');
-      setNewNumber('');
+      const maxId = Math.max(persons.map(p => p.id))
+      const personObj = {
+        name: newName,
+        number: newNumber,
+        id: maxId + 1,
+      }
+      addPerson(personObj).then(res => {
+        setPersons(persons.concat(res.data));
+        setNewName('');
+        setNewNumber('');
+      })
+    }
+  };
+
+  const removePerson = (person) => {
+    if (window.confirm(`Delete ${person.name}`)) {
+      deletePerson(person.id).then(res => {
+        const newPersons = persons.filter(elem => elem.id !== person.id);
+        setPersons(newPersons);
+      });
     }
   };
 
@@ -92,7 +121,7 @@ const App = () => {
         submitNewPerson={submitNewPerson}
       />
       <h2>Numbers</h2>
-      <Persons persons={shownPersons} />
+      <Persons persons={shownPersons} deletePerson={removePerson} />
     </div>
   )
 
