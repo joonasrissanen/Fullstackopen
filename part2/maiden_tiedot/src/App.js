@@ -10,9 +10,9 @@ const Filter = ({ filterValue, handleFilterChange }) => {
 }
 
 const Weather = ({ location }) => {
-  const api_key = process.env.REACT_APP_API_KEY;
   const [weather, setWeather] = useState(null);
   useEffect(() => {
+    const api_key = process.env.REACT_APP_API_KEY;
     axios.get(
       `http://api.weatherstack.com/current?access_key=${api_key}&query=${location}`
     ).then(result => setWeather(result.data.current));

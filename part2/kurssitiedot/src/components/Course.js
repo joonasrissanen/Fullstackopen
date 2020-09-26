@@ -16,7 +16,7 @@ const Content = ({ parts }) => {
   return (
     <div>
       {parts.map((part) => {
-        return <Part part={part} />;
+        return <Part key={part.name} part={part} />;
       })}
     </div>
   );
