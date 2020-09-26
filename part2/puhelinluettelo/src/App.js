@@ -1,6 +1,27 @@
 import React, { useState, useEffect } from 'react'
 import { getAll, addPerson, deletePerson, updatePerson } from './persons';
 
+const Notification = ({ message, isError }) => {
+  const style = {
+    background: 'lightgrey',
+    fontSize: 20,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  };
+
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div style={{...style, color: isError ? 'red' : 'green'}}>
+      {message}
+    </div>
+  )
+};
+
 const PersonForm = ({ name, number, handleNameChange, handleNumberChange, submitNewPerson}) => {
   return (
     <form>
@@ -42,6 +63,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('');
   const [filterInput, setFilterInput] = useState('');
   const [shownPersons, setShownPersons] = useState(persons);
+  const [message, setMessage] = useState(null);
+  const [isError, setError] = useState(false);
 
   useEffect(() => {
     getAll().then(res => setPersons(res.data));
@@ -78,8 +101,11 @@ const App = () => {
     if (persons.map(person => person.name.toLowerCase()).includes(newName.toLowerCase())) {
       if(window.confirm(`${newName} is already added to phonebook. Replace the old number with a new one?`)) {
         const oldPerson = persons.find(p => p.name.toLowerCase() === newName.toLowerCase());
-        updatePerson(oldPerson.id, { ...oldPerson, number: newNumber}).then(res => {
+        updatePerson(oldPerson.id, { ...oldPerson, number: newNumber})
+        .then(res => {
           setPersons(persons.map(p => p.id === oldPerson.id ? res.data : p));
+          setMessage(`Updated ${newName}`);
+          setError(false);
           setNewName('');
           setNewNumber('');
         });
@@ -93,6 +119,8 @@ const App = () => {
       }
       addPerson(personObj).then(res => {
         setPersons(persons.concat(res.data));
+        setMessage(`Added ${newName}`);
+        setError(false);
         setNewName('');
         setNewNumber('');
       })
@@ -101,9 +129,13 @@ const App = () => {
 
   const removePerson = (person) => {
     if (window.confirm(`Delete ${person.name}`)) {
-      deletePerson(person.id).then(res => {
+      deletePerson(person.id).then(() => {
         const newPersons = persons.filter(elem => elem.id !== person.id);
+        setMessage(`Deleted ${person.name}`);
         setPersons(newPersons);
+      }).catch(() => {
+        setMessage(`Information of ${person.name} has already been removed from the server.`);
+        setError(true);
       });
     }
   };
@@ -111,6 +143,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} isError={isError} />
       <Filter filterValue={filterInput} handleFilterChange={handleFilterChange} />
       <h2>Add a new</h2>
       <PersonForm
