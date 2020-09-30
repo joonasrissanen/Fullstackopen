@@ -22,10 +22,16 @@ const persons = [
 ];
 
 const express = require('express');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
+
 const app = express();
 const PORT = 3001;
 const jsonParser = bodyParser.json();
+
+app.use(morgan('tiny'));
+morgan.token('body', (req, res) => JSON.stringify(req.body));
+app.use(morgan(':method :url :status - :response-time ms :body'));
 
 app.get('/info', (req, res) => {
   const currentDate = new Date();
