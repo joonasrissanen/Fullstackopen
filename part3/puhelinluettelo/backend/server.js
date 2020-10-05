@@ -1,26 +1,4 @@
-let persons = [
-  {
-      "name": "Arto Hellas",
-      "number": "040-123456",
-      "id": 1
-    },
-    {
-      "name": "Ada Lovelace",
-      "number": "39-44-5323523",
-      "id": 2
-    },
-    {
-      "name": "Dan Abramov",
-      "number": "12-43-234345",
-      "id": 3
-    },
-    {
-      "name": "Mary Poppendieck",
-      "number": "39-23-6423122",
-      "id": 4
-    }
-];
-
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
@@ -28,59 +6,82 @@ const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const jsonParser = bodyParser.json();
+const Person = require('./models/person');
+
+const errorHandler = (error, req, res, next) => {
+  console.error(error.message);
+
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' });
+  }
+  next(error);
+};
 
 app.use(morgan('tiny'));
 morgan.token('body', (req, res) => JSON.stringify(req.body));
 app.use(morgan(':method :url :status - :response-time ms :body'));
 app.use(cors());
+app.use(bodyParser.json());
 app.use(express.static('build'));
+app.use(errorHandler);
 
 app.get('/info', (req, res) => {
-  const currentDate = new Date();
-  const responseBody = `
-    <p>Phonebook has info for ${persons.length} people.</p>
-    <p>${currentDate.toString()}</p>
-  `;
-  res.send(responseBody);
+  Person.find({}).then(people => {
+    const currentDate = new Date();
+    const responseBody = `
+      <p>Phonebook has info for ${people.length} people.</p>
+      <p>${currentDate.toString()}</p>
+    `;
+    res.send(responseBody);
+  });
 });
 
 app.get('/api/persons', (req, res) => {
-  res.json(persons);
+  Person.find({}).then(people => {
+    res.json(people);
+  })
 });
 
-app.get('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const person = persons.find(p => p.id === id);
-  if (person) {
+app.get('/api/persons/:id', (req, res, next) => {
+  Person.findById(req.params.id).then(person => {
     res.json(person);
-  } else {
-    res.sendStatus(404);
-  }
+  })
+  .catch(error => next(error));
 });
 
-app.delete('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id);
-  persons = persons.filter(p => p.id !== id);
-  res.status(204).end();
+app.delete('/api/persons/:id', (req, res, next) => {
+  Person.findOneAndRemove(req.params.id).then(result => {
+    res.sendStatus(204);
+  })
+  .catch(error => next(error));
 });
 
-app.post('/api/persons', jsonParser, (req, res) => {
-  const person = req.body;
-  if (!person || !person.name || !person.number) {
+app.put('/api/persons/:id', (req, res, next) => {
+  const body = req.body;
+  const person = {
+    name: body.name,
+    number: body.number,
+  };
+  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then(updatePerson => {
+      res.json(updatePerson);
+    })
+    .catch(error => next(error));
+});
+
+app.post('/api/persons', (req, res) => {
+  const body = req.body;
+  if (!body || !body.name || !body.number) {
     const error = { error: 'name and number must be defined' };
     res.status(400).json(error);
-  } else if (persons.map(p => p.name).includes(person.name)) {
-    const error = { error: 'name must be unique' };
-    res.status(400).json(error);
   } else {
-    const newId = Math.floor(Math.random() * Math.max(100000));
-    const newPerson = {
-      ...person,
-      id: newId,
-    };
-    persons.push(newPerson);
-    res.sendStatus(201);
+    const person = new Person({
+      name: body.name,
+      number: body.number,
+    });
+    person.save().then(savedPerson => {
+      res.json(savedPerson);
+    });
   }
 });
 
