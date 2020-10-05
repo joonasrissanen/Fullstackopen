@@ -73,9 +73,11 @@ const App = () => {
   useEffect(() => {
     const filteredPersons = [];
     persons.forEach(person => {
-      const name = person.name.toLowerCase();
-      if (name.substring(0, filterInput.length) === filterInput.toLowerCase() || filterInput === '') {
-        filteredPersons.push(person);
+      if (person && person.name) {
+        const name = person.name.toLowerCase();
+        if (name.substring(0, filterInput.length) === filterInput.toLowerCase() || filterInput === '') {
+          filteredPersons.push(person);
+        }
       }
     })
     setShownPersons(filteredPersons);
@@ -115,10 +117,9 @@ const App = () => {
       const personObj = {
         name: newName,
         number: newNumber,
-        id: maxId + 1,
       }
-      addPerson(personObj).then(res => {
-        setPersons(persons.concat(res.data));
+      addPerson(personObj).then(() => {
+        getAll().then(res => setPersons(res.data));
         setMessage(`Added ${newName}`);
         setError(false);
         setNewName('');
