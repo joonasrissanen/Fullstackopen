@@ -110,10 +110,14 @@ const App = () => {
           setError(false);
           setNewName('');
           setNewNumber('');
+        })
+        .catch(error => {
+          console.log(error)
+          setMessage(error);
+          setError(true);
         });
       }
     } else if (newName !== '' && newNumber !== '') {
-      const maxId = Math.max(persons.map(p => p.id))
       const personObj = {
         name: newName,
         number: newNumber,
@@ -124,7 +128,10 @@ const App = () => {
         setError(false);
         setNewName('');
         setNewNumber('');
-      })
+      }).catch((error) => {
+        setMessage(error.response.data.error);
+        setError(true);
+      });
     }
   };
 

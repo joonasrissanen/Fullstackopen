@@ -8,22 +8,12 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const Person = require('./models/person');
 
-const errorHandler = (error, req, res, next) => {
-  console.error(error.message);
-
-  if (error.name === 'CastError') {
-    return res.status(400).send({ error: 'malformatted id' });
-  }
-  next(error);
-};
-
 app.use(morgan('tiny'));
 morgan.token('body', (req, res) => JSON.stringify(req.body));
 app.use(morgan(':method :url :status - :response-time ms :body'));
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(express.static('build'));
-app.use(errorHandler);
 
 app.get('/info', (req, res) => {
   Person.find({}).then(people => {
@@ -63,13 +53,12 @@ app.put('/api/persons/:id', (req, res, next) => {
     number: body.number,
   };
   Person.findByIdAndUpdate(req.params.id, person, { new: true })
-    .then(updatePerson => {
-      res.json(updatePerson);
-    })
+    .then(updatePerson => updatePerson.toJSON())
+    .then(formatted => res.json(formatted))
     .catch(error => next(error));
 });
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const body = req.body;
   if (!body || !body.name || !body.number) {
     const error = { error: 'name and number must be defined' };
@@ -79,10 +68,23 @@ app.post('/api/persons', (req, res) => {
       name: body.name,
       number: body.number,
     });
-    person.save().then(savedPerson => {
-      res.json(savedPerson);
-    });
+    person.save()
+      .then(savedPerson => savedPerson.toJSON())
+      .then(formatted => res.json(formatted))
+      .catch(error => next(error));
   }
 });
+
+const errorHandler = (error, req, res, next) => {
+  console.error(error.message);
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' });
+  } else if (error.name === 'ValidationError') {
+    return res.status(400).json({ error: error.message })
+  }
+  next(error);
+};
+
+app.use(errorHandler);
 
 app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
