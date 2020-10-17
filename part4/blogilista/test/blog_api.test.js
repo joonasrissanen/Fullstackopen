@@ -71,6 +71,27 @@ test('if new blog does not have url, 400 is returned', async () => {
     .expect(400);
 });
 
+test('blog can be deleted by id', async () => {
+  const id = initialBlogs[0]._id;
+  await api.delete(`/api/blogs/${id}`).expect(204);
+  const response = await api.get('/api/blogs');
+  expect(response.body).toHaveLength(1);
+});
+
+test('blog can be updated by id', async () => {
+  const id = initialBlogs[0]._id;
+  const updatedBlog = {
+    ...initialBlogs[0],
+    id: initialBlogs[0]._id,
+    likes: 10,
+  };
+  delete updatedBlog._id;
+  delete updatedBlog.__v;
+  await api.put(`/api/blogs/${id}`).send(updatedBlog).expect(200);
+  const response = await api.get('/api/blogs');
+  expect(response.body.find(blog => blog.id === id)).toEqual(updatedBlog);
+});
+
 beforeEach(async () => {
   await Blog.deleteMany({});
   let blogObject = new Blog(initialBlogs[0]);
