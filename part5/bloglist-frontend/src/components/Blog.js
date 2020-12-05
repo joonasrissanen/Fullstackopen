@@ -14,9 +14,11 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
 
   const likeBlog = (event) => {
     event.preventDefault()
+    console.log(blog)
     const newBlog = {
       ...blog,
       likes: blog.likes + 1,
+      user: blog.user.id
     }
     updateBlog(newBlog)
   }

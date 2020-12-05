@@ -76,7 +76,8 @@ const App = () => {
 
   const updateBlog = (blog) => {
     if (user && user.token) {
-      blogService.updateBlog(blog, user.token).then(() => {
+      blogService.updateBlog(blog, user.token).then(res => {
+        console.log(res)
         blogService.getAll().then(blogs =>
           setBlogs( blogs )
         )
@@ -124,9 +125,11 @@ const App = () => {
       <Togglable buttonLabel='new blog'>
         <BlogForm submitBlog={submitBlog} />
       </Togglable>
-      {sortedBlogs.map(blog =>
-        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} />
-      )}
+      <div id="blog-list">
+        {sortedBlogs.map(blog =>
+          <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} />
+        )}
+      </div>
     </div>
   )
 }

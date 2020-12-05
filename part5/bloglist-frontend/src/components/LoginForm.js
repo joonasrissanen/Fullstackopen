@@ -29,12 +29,12 @@ const LoginForm = ({ setUser, sendNotification }) => {
   return (
     <form onSubmit={loginRequest}>
       <div>username
-        <input type="text" onChange={usernameOnChange}/>
+        <input id="username" type="text" onChange={usernameOnChange}/>
       </div>
       <div>password
-        <input type="password" onChange={passwordOnChange}/>
+        <input id="password" type="password" onChange={passwordOnChange}/>
       </div>
-      <button type="submit" >login</button>
+      <button id="login-button" type="submit" >login</button>
     </form>
   )
 }
