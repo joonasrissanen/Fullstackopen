@@ -13,13 +13,10 @@ const AnecdoteList = () => {
         return filtered.sort((a, b) => b.votes - a.votes)
     })
     const vote = (id) => {
-      dispatch(voteAnecdote(id))
       const anecdote = anecdotes.find(a => a.id === id)
+      dispatch(voteAnecdote(anecdote))
       const message = `you voted ${anecdote.content}`
-      dispatch(newNotification(message))
-      setTimeout(() => {
-        dispatch(newNotification(null))
-      }, 5000)
+      dispatch(newNotification(message, 5))
     }
     return (
         <>
