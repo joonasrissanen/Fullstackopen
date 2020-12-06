@@ -1,16 +1,19 @@
+let timeoutId = null
 
-
-export const newNotification = (message, timeout) => {
+export const newNotification = (message, timeoutInSeconds) => {
     return async dispatch => {
       dispatch({
         type: 'NEW_NOTIFICATION',
         data: message,
       })
-      setTimeout(() => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+      timeoutId = setTimeout(() => {
         dispatch({
           type: 'REMOVE_NOTIFICATION',
         })
-      }, timeout * 1000)
+      }, timeoutInSeconds * 1000)
     }
 }
 
