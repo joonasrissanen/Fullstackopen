@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
-const Blog = ({ blog, updateBlog, deleteBlog }) => {
+const Blog = ({ blog, likeBlog, deleteBlog }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -12,15 +12,9 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
   const [isHidden, setHidden] = useState(true)
   const showWhenVisible = { display: isHidden ? 'none' : '' }
 
-  const likeBlog = (event) => {
+  const like = (event) => {
     event.preventDefault()
-    console.log(blog)
-    const newBlog = {
-      ...blog,
-      likes: blog.likes + 1,
-      user: blog.user.id
-    }
-    updateBlog(newBlog)
+    likeBlog(blog)
   }
 
   const removeBlog = (event) => {
@@ -37,7 +31,7 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
       <div style={showWhenVisible}>
         <div>{blog.url}</div>
                 likes {blog.likes}
-        <button onClick={likeBlog} >like</button>
+        <button onClick={like} >like</button>
         <div>{blog.user && blog.user.name}</div>
         <button onClick={removeBlog}>remove</button>
       </div>
@@ -46,15 +40,10 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
 }
 
 Blog.propTypes = {
-  blog: PropTypes.shape({
-    title: PropTypes.string,
-    author: PropTypes.string,
-    url: PropTypes.string,
-    likes: PropTypes.number,
-    user: PropTypes.object,
-  }),
-  updateBlog: PropTypes.func.isRequired,
+  blog: PropTypes.object,
+  likeBlog: PropTypes.func.isRequired,
   deleteBlog: PropTypes.func.isRequired,
 }
+
 
 export default Blog

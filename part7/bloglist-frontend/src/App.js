@@ -4,18 +4,15 @@ import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
-import blogService from './services/blogs'
 import Notification from './components/Notification'
 import { newNotification } from './reducers/notificationReducer'
+import { initializeBlogs, createBlog, likeBlog, deleteBlog } from './reducers/blogReducer'
 
 const App = (props) => {
-  const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )
+    props.initializeBlogs()
   }, [])
 
   useEffect(() => {
@@ -28,36 +25,22 @@ const App = (props) => {
 
   const submitBlog = (blog) => {
     if (user && user.token) {
-      blogService.postBlog(blog, user.token).then(() => {
-        props.newNotification({ message: `A new blog ${blog.title} by ${blog.author}`, isError: false }, 5)
-        blogService.getAll().then(blogs =>
-          setBlogs( blogs )
-        )
-      }).catch(error => {
-        console.log(error)
-        props.newNotification({ message: 'Creating blog failed', isError: true }, 5)
-      })
+      props.createBlog(blog, user.token)
+      props.newNotification({ message: `A new blog ${blog.title} by ${blog.author}`, isError: false }, 5)
+    } else {
+      props.newNotification({ message: 'Creating blog failed', isError: true }, 5)
     }
   }
 
-  const updateBlog = (blog) => {
+  const like = (blog) => {
     if (user && user.token) {
-      blogService.updateBlog(blog, user.token).then(res => {
-        console.log(res)
-        blogService.getAll().then(blogs =>
-          setBlogs( blogs )
-        )
-      })
+      props.likeBlog(blog, user.token)
     }
   }
 
   const deleteBlog = (blog) => {
     if (user && user.token) {
-      blogService.removeBlog(blog, user.token).then(() => {
-        blogService.getAll().then(blogs =>
-          setBlogs( blogs )
-        )
-      })
+      props.deleteBlog(blog, user.token)
     }
   }
 
@@ -78,7 +61,7 @@ const App = (props) => {
     )
 
   }
-  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
+  const sortedBlogs = props.blogs.sort((a, b) => b.likes - a.likes)
 
   return (
     <div>
@@ -93,16 +76,27 @@ const App = (props) => {
       </Togglable>
       <div id="blog-list">
         {sortedBlogs.map(blog =>
-          <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} />
+          <Blog key={blog.id} blog={blog} likeBlog={like} deleteBlog={deleteBlog} />
         )}
       </div>
     </div>
   )
 }
 
+const mapStateToProps = ({ blogs }) => {
+  return {
+    blogs
+  }
+}
+
 const mapDispatchToProps = {
   newNotification,
+  initializeBlogs,
+  createBlog,
+  likeBlog,
+  deleteBlog
 }
-const ConnectedApp = connect(null, mapDispatchToProps)(App)
+
+const ConnectedApp = connect(mapStateToProps, mapDispatchToProps)(App)
 
 export default ConnectedApp
