@@ -7,20 +7,13 @@ import Togglable from './components/Togglable'
 import Notification from './components/Notification'
 import { newNotification } from './reducers/notificationReducer'
 import { initializeBlogs, createBlog, likeBlog, deleteBlog } from './reducers/blogReducer'
+import { initializeUser, logoutUser } from './reducers/userReducer'
 
 const App = (props) => {
-  const [user, setUser] = useState(null)
-
+  const { user } = props
   useEffect(() => {
     props.initializeBlogs()
-  }, [])
-
-  useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogUser')
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-    }
+    props.initializeUser()
   }, [])
 
   const submitBlog = (blog) => {
@@ -46,16 +39,16 @@ const App = (props) => {
 
   const logout = (event) => {
     event.preventDefault()
-    window.localStorage.removeItem('loggedBlogUser')
-    setUser(null)
+    props.logoutUser()
   }
+
   if (!user) {
     return (
       <div>
         <h1>Log in to application</h1>
         <Notification />
         <Togglable buttonLabel='log in'>
-          <LoginForm setUser={setUser}/>
+          <LoginForm />
         </Togglable>
       </div>
     )
@@ -83,9 +76,10 @@ const App = (props) => {
   )
 }
 
-const mapStateToProps = ({ blogs }) => {
+const mapStateToProps = ({ blogs, user }) => {
   return {
-    blogs
+    blogs,
+    user
   }
 }
 
@@ -94,7 +88,9 @@ const mapDispatchToProps = {
   initializeBlogs,
   createBlog,
   likeBlog,
-  deleteBlog
+  deleteBlog,
+  initializeUser,
+  logoutUser
 }
 
 const ConnectedApp = connect(mapStateToProps, mapDispatchToProps)(App)

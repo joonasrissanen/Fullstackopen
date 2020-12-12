@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { login } from '../services/users'
 import { newNotification } from '../reducers/notificationReducer'
+import { setUser } from '../reducers/userReducer'
+import userService from '../services/users'
 
-const LoginForm = ({ setUser, newNotification }) => {
+
+const LoginForm = ({ newNotification, setUser }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
@@ -18,9 +20,8 @@ const LoginForm = ({ setUser, newNotification }) => {
   }
   const loginRequest = (event) => {
     event.preventDefault()
-    return login(username, password)
+    return userService.login(username, password)
       .then(res => {
-        window.localStorage.setItem('loggedBlogUser', JSON.stringify(res.data))
         setUser(res.data)
       })
       .catch(() => {
@@ -46,7 +47,8 @@ LoginForm.propTypes = {
 }
 
 const mapDispatchToProps = {
-  newNotification
+  newNotification,
+  setUser
 }
 
 const ConnectedLoginForm = connect(null, mapDispatchToProps)(LoginForm)
