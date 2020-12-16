@@ -1,33 +1,33 @@
-import React, { useState } from 'react'
-import { connect } from 'react-redux'
-import PropTypes from 'prop-types'
-import { newNotification } from '../reducers/notificationReducer'
-import { setUser } from '../reducers/userReducer'
-import userService from '../services/users'
+import React, { useState } from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import { newNotification } from '../reducers/notificationReducer';
+import { setUser } from '../reducers/userReducer';
+import userService from '../services/users';
 
 
 const LoginForm = ({ newNotification, setUser }) => {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const usernameOnChange = (event) => {
-    event.preventDefault()
-    setUsername(event.target.value)
-  }
+    event.preventDefault();
+    setUsername(event.target.value);
+  };
   const passwordOnChange = (event) => {
-    event.preventDefault()
-    setPassword(event.target.value)
-  }
+    event.preventDefault();
+    setPassword(event.target.value);
+  };
   const loginRequest = (event) => {
-    event.preventDefault()
+    event.preventDefault();
     return userService.login(username, password)
       .then(res => {
-        setUser(res.data)
+        setUser(res.data);
       })
       .catch(() => {
-        newNotification({ message: 'Wrong username or password', isError: true }, 5)
-      })
-  }
+        newNotification({ message: 'Wrong username or password', isError: true }, 5);
+      });
+  };
   return (
     <form onSubmit={loginRequest}>
       <div>username
@@ -38,19 +38,19 @@ const LoginForm = ({ newNotification, setUser }) => {
       </div>
       <button id="login-button" type="submit" >login</button>
     </form>
-  )
-}
+  );
+};
 
 LoginForm.propTypes = {
   setUser: PropTypes.func.isRequired,
   newNotification: PropTypes.func.isRequired
-}
+};
 
 const mapDispatchToProps = {
   newNotification,
   setUser
-}
+};
 
-const ConnectedLoginForm = connect(null, mapDispatchToProps)(LoginForm)
+const ConnectedLoginForm = connect(null, mapDispatchToProps)(LoginForm);
 
-export default ConnectedLoginForm
+export default ConnectedLoginForm;

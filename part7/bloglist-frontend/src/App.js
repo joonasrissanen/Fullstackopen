@@ -1,46 +1,54 @@
-import React, { useState, useEffect } from 'react'
-import { connect } from 'react-redux'
-import Blog from './components/Blog'
-import LoginForm from './components/LoginForm'
-import BlogForm from './components/BlogForm'
-import Togglable from './components/Togglable'
-import Notification from './components/Notification'
-import { newNotification } from './reducers/notificationReducer'
-import { initializeBlogs, createBlog, likeBlog, deleteBlog } from './reducers/blogReducer'
-import { initializeUser, logoutUser } from './reducers/userReducer'
+import React, { useEffect } from 'react';
+import { connect } from 'react-redux';
+import {
+  Switch,
+  Route,
+  // Link,
+  // useParams,
+  // useHistory,
+} from 'react-router-dom';
+import Blog from './components/Blog';
+import LoginForm from './components/LoginForm';
+import BlogForm from './components/BlogForm';
+import Togglable from './components/Togglable';
+import Notification from './components/Notification';
+import { newNotification } from './reducers/notificationReducer';
+import { initializeBlogs, createBlog, likeBlog, deleteBlog } from './reducers/blogReducer';
+import { initializeUser, logoutUser } from './reducers/userReducer';
+import UsersView from './components/UsersView';
 
 const App = (props) => {
-  const { user } = props
+  const { user } = props;
   useEffect(() => {
-    props.initializeBlogs()
-    props.initializeUser()
-  }, [])
+    props.initializeBlogs();
+    props.initializeUser();
+  }, []);
 
   const submitBlog = (blog) => {
     if (user && user.token) {
-      props.createBlog(blog, user.token)
-      props.newNotification({ message: `A new blog ${blog.title} by ${blog.author}`, isError: false }, 5)
+      props.createBlog(blog, user.token);
+      props.newNotification({ message: `A new blog ${blog.title} by ${blog.author}`, isError: false }, 5);
     } else {
-      props.newNotification({ message: 'Creating blog failed', isError: true }, 5)
+      props.newNotification({ message: 'Creating blog failed', isError: true }, 5);
     }
-  }
+  };
 
   const like = (blog) => {
     if (user && user.token) {
-      props.likeBlog(blog, user.token)
+      props.likeBlog(blog, user.token);
     }
-  }
+  };
 
   const deleteBlog = (blog) => {
     if (user && user.token) {
-      props.deleteBlog(blog, user.token)
+      props.deleteBlog(blog, user.token);
     }
-  }
+  };
 
   const logout = (event) => {
-    event.preventDefault()
-    props.logoutUser()
-  }
+    event.preventDefault();
+    props.logoutUser();
+  };
 
   if (!user) {
     return (
@@ -51,37 +59,44 @@ const App = (props) => {
           <LoginForm />
         </Togglable>
       </div>
-    )
+    );
 
   }
-  const sortedBlogs = props.blogs.sort((a, b) => b.likes - a.likes)
+  const sortedBlogs = props.blogs.sort((a, b) => b.likes - a.likes);
 
   return (
     <div>
       <h2>blogs</h2>
       <Notification />
       <div>
-        {user.name}
+        {user.name} logged in
         <button onClick={logout}>logout</button>
       </div>
-      <Togglable buttonLabel='new blog'>
-        <BlogForm submitBlog={submitBlog} />
-      </Togglable>
-      <div id="blog-list">
-        {sortedBlogs.map(blog =>
-          <Blog key={blog.id} blog={blog} likeBlog={like} deleteBlog={deleteBlog} />
-        )}
-      </div>
+      <Switch>
+        <Route path="/users">
+          <UsersView />
+        </Route>
+        <Route path="/">
+          <Togglable buttonLabel='new blog'>
+            <BlogForm submitBlog={submitBlog} />
+          </Togglable>
+          <div id="blog-list">
+            {sortedBlogs.map(blog =>
+              <Blog key={blog.id} blog={blog} likeBlog={like} deleteBlog={deleteBlog} />
+            )}
+          </div>
+        </Route>
+      </Switch>
     </div>
-  )
-}
+  );
+};
 
 const mapStateToProps = ({ blogs, user }) => {
   return {
     blogs,
     user
-  }
-}
+  };
+};
 
 const mapDispatchToProps = {
   newNotification,
@@ -91,8 +106,8 @@ const mapDispatchToProps = {
   deleteBlog,
   initializeUser,
   logoutUser
-}
+};
 
-const ConnectedApp = connect(mapStateToProps, mapDispatchToProps)(App)
+const ConnectedApp = connect(mapStateToProps, mapDispatchToProps)(App);
 
-export default ConnectedApp
+export default ConnectedApp;

@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import PropTypes from 'prop-types'
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
 const Blog = ({ blog, likeBlog, deleteBlog }) => {
   const blogStyle = {
@@ -8,21 +8,21 @@ const Blog = ({ blog, likeBlog, deleteBlog }) => {
     border: 'solid',
     borderWidth: 1,
     marginBottom: 5
-  }
-  const [isHidden, setHidden] = useState(true)
-  const showWhenVisible = { display: isHidden ? 'none' : '' }
+  };
+  const [isHidden, setHidden] = useState(true);
+  const showWhenVisible = { display: isHidden ? 'none' : '' };
 
   const like = (event) => {
-    event.preventDefault()
-    likeBlog(blog)
-  }
+    event.preventDefault();
+    likeBlog(blog);
+  };
 
   const removeBlog = (event) => {
-    event.preventDefault()
+    event.preventDefault();
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      deleteBlog(blog)
+      deleteBlog(blog);
     }
-  }
+  };
 
   return (
     <div style={blogStyle}>
@@ -36,14 +36,14 @@ const Blog = ({ blog, likeBlog, deleteBlog }) => {
         <button onClick={removeBlog}>remove</button>
       </div>
     </div>
-  )
-}
+  );
+};
 
 Blog.propTypes = {
   blog: PropTypes.object,
   likeBlog: PropTypes.func.isRequired,
   deleteBlog: PropTypes.func.isRequired,
-}
+};
 
 
-export default Blog
+export default Blog;
