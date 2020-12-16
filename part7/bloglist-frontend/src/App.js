@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import {
   Switch,
   Route,
-  // Link,
-  // useParams,
+  Link,
+  useParams,
   // useHistory,
 } from 'react-router-dom';
+import userService from './services/users';
 import Blog from './components/Blog';
 import LoginForm from './components/LoginForm';
 import BlogForm from './components/BlogForm';
@@ -17,12 +18,59 @@ import { initializeBlogs, createBlog, likeBlog, deleteBlog } from './reducers/bl
 import { initializeUser, logoutUser } from './reducers/userReducer';
 import UsersView from './components/UsersView';
 
+const User = ({ users }) => {
+  const id = useParams().id;
+  const user = users.find(u => u.id === id);
+  if (!users || !user) {
+    return null;
+  }
+  return (
+    <div>
+      <h2>{user.name}</h2>
+      <h3>added blogs</h3>
+      <ul>
+        {user.blogs.map(blog => <li key={blog.id}>{blog.title}</li>)}
+      </ul>
+    </div>
+  );
+};
+
+const BlogListItem = ({ blog }) => {
+  const style = {
+    marginTop: 10,
+    border: 'solid',
+    borderColor: 'black',
+    borderWidth: 1,
+  };
+  return (
+    <div style={style}>
+      <Link to={`/blogs/${blog.id}`}>
+        {blog.title}
+      </Link>
+    </div>
+  );
+};
+
+const Navigation = ({ loggedUserName, logout }) => {
+  return (
+    <div>
+      <Link to="/">blogs</Link>{' '}
+      <Link to="/users">users</Link>{' '}
+      {loggedUserName} logged in{' '}
+      <button onClick={logout}>logout</button>
+    </div>
+  );
+};
 const App = (props) => {
   const { user } = props;
+
+  const [usersList, setUsers] = useState([]);
   useEffect(() => {
     props.initializeBlogs();
     props.initializeUser();
+    userService.getAll().then(response => setUsers(response.data));
   }, []);
+
 
   const submitBlog = (blog) => {
     if (user && user.token) {
@@ -66,24 +114,25 @@ const App = (props) => {
 
   return (
     <div>
+      <Navigation loggedUserName={user.name} logout={logout} />
       <h2>blogs</h2>
       <Notification />
-      <div>
-        {user.name} logged in
-        <button onClick={logout}>logout</button>
-      </div>
       <Switch>
+        <Route path="/blogs/:id">
+          <Blog blogs={sortedBlogs} likeBlog={like} deleteBlog={deleteBlog} />
+        </Route>
+        <Route path="/users/:id">
+          <User users={usersList} />
+        </Route>
         <Route path="/users">
-          <UsersView />
+          <UsersView users={usersList} />
         </Route>
         <Route path="/">
           <Togglable buttonLabel='new blog'>
             <BlogForm submitBlog={submitBlog} />
           </Togglable>
           <div id="blog-list">
-            {sortedBlogs.map(blog =>
-              <Blog key={blog.id} blog={blog} likeBlog={like} deleteBlog={deleteBlog} />
-            )}
+            {sortedBlogs.map(blog => <BlogListItem key={blog.id} blog={blog} />)}
           </div>
         </Route>
       </Switch>

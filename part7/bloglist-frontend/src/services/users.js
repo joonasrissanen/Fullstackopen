@@ -6,8 +6,7 @@ const login = (username, password) => {
 };
 
 const getAll = async () => {
-  const response = await axios.get(usersUrl);
-  return response.data;
+  return axios.get(usersUrl);
 };
 const userService = {
   getAll,
