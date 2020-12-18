@@ -4,8 +4,7 @@ import {
   Switch,
   Route,
   Link,
-  useParams,
-  // useHistory,
+  useRouteMatch,
 } from 'react-router-dom';
 import userService from './services/users';
 import Blog from './components/Blog';
@@ -18,10 +17,8 @@ import { initializeBlogs, createBlog, likeBlog, deleteBlog } from './reducers/bl
 import { initializeUser, logoutUser } from './reducers/userReducer';
 import UsersView from './components/UsersView';
 
-const User = ({ users }) => {
-  const id = useParams().id;
-  const user = users.find(u => u.id === id);
-  if (!users || !user) {
+const User = ({ user }) => {
+  if (!user) {
     return null;
   }
   return (
@@ -65,12 +62,14 @@ const App = (props) => {
   const { user } = props;
 
   const [usersList, setUsers] = useState([]);
+  const blogsMatch = useRouteMatch('/blogs/:id');
+  const usersMatch = useRouteMatch('/users/:id');
+
   useEffect(() => {
     props.initializeBlogs();
     props.initializeUser();
     userService.getAll().then(response => setUsers(response.data));
   }, []);
-
 
   const submitBlog = (blog) => {
     if (user && user.token) {
@@ -110,8 +109,10 @@ const App = (props) => {
     );
 
   }
-  const sortedBlogs = props.blogs.sort((a, b) => b.likes - a.likes);
+  const sorted = props.blogs.sort((a,b) => b.likes - a.likes);
 
+  const selectedBlog = blogsMatch ? sorted.find(b => b.id === blogsMatch.params.id) : null;
+  const selectedUser = usersMatch ? usersList.find(u => u.id === usersMatch.params.id) : null;
   return (
     <div>
       <Navigation loggedUserName={user.name} logout={logout} />
@@ -119,10 +120,10 @@ const App = (props) => {
       <Notification />
       <Switch>
         <Route path="/blogs/:id">
-          <Blog blogs={sortedBlogs} likeBlog={like} deleteBlog={deleteBlog} />
+          <Blog blog={selectedBlog} likeBlog={like} deleteBlog={deleteBlog} />
         </Route>
         <Route path="/users/:id">
-          <User users={usersList} />
+          <User user={selectedUser} />
         </Route>
         <Route path="/users">
           <UsersView users={usersList} />
@@ -132,7 +133,7 @@ const App = (props) => {
             <BlogForm submitBlog={submitBlog} />
           </Togglable>
           <div id="blog-list">
-            {sortedBlogs.map(blog => <BlogListItem key={blog.id} blog={blog} />)}
+            {sorted.map(blog => <BlogListItem key={blog.id} blog={blog} />)}
           </div>
         </Route>
       </Switch>

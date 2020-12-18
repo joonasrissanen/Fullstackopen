@@ -1,18 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const User = ({ user }) => {
-  if (!user) {
-    return null;
-  }
-  const { name } = user;
-  return (
-    <div>
-      <h2>{name}</h2>
-    </div>
-  );
-};
-
 const UsersView = ({ users }) => {
   return (
     <div>

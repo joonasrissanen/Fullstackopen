@@ -44,6 +44,17 @@ export const deleteBlog = (blog, token) => {
     });
   };
 };
+
+export const commentBlog = (blog, comment) => {
+  return async dispatch => {
+    const commented = await blogService.commentBlog(blog, comment);
+    dispatch({
+      type: 'COMMENT_BLOG',
+      data: commented,
+    });
+  };
+};
+
 const blogReducer = (state = [], action) => {
   switch (action.type) {
   case 'NEW_BLOG':
@@ -57,6 +68,10 @@ const blogReducer = (state = [], action) => {
   case 'DELETE_BLOG': {
     const id = action.data.id;
     return state.filter(b => b.id === id);
+  }
+  case 'COMMENT_BLOG': {
+    const id = action.data.id;
+    return state.map(b => b.id === id ? action.data : b);
   }
   default:
     return state;
