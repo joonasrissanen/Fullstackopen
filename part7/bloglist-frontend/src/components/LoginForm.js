@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { Button, Form } from 'react-bootstrap';
 import { newNotification } from '../reducers/notificationReducer';
 import { setUser } from '../reducers/userReducer';
 import userService from '../services/users';
@@ -29,15 +30,17 @@ const LoginForm = ({ newNotification, setUser }) => {
       });
   };
   return (
-    <form onSubmit={loginRequest}>
-      <div>username
-        <input id="username" type="text" onChange={usernameOnChange}/>
-      </div>
-      <div>password
-        <input id="password" type="password" onChange={passwordOnChange}/>
-      </div>
-      <button id="login-button" type="submit" >login</button>
-    </form>
+    <Form onSubmit={loginRequest}>
+      <Form.Group>
+        <Form.Label>Username</Form.Label>
+        <Form.Control id="username" type="text" onChange={usernameOnChange}/>
+      </Form.Group>
+      <Form.Group>
+        <Form.Label>Password</Form.Label>
+        <Form.Control id="password" type="password" onChange={passwordOnChange}/>
+      </Form.Group>
+      <Button variant="primary" id="login-button" type="submit" >login</Button>
+    </Form>
   );
 };
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { Button, Form, ListGroup } from 'react-bootstrap';
 import { commentBlog } from '../reducers/blogReducer';
 
 
@@ -28,21 +29,23 @@ const Blog = ({ blog, likeBlog, commentBlog }) => {
       <h2>{blog.title}</h2>
       <a href={blog.url}>{blog.url}</a>
       <div>
-        likes {blog.likes}
-        <button onClick={like} >like</button>
+        likes {blog.likes}{' '}
+        <Button variant="primary" onClick={like} >like</Button>
       </div>
       <div>
         added by {blog.user && blog.user.name}
       </div>
-      <h2>comments</h2>
+      <h2>Comments</h2>
       <div>
-        <form onSubmit={sendComment}>
-          <input value={comment} onChange={e => setComment(e.target.value)}/>
-          <button type="submit">add comment</button>
-        </form>
-        <ul>
-          {blog.comments.map((comment, i) => <li key={`${blog.id}-comment-${i}`}>{comment}</li>)}
-        </ul>
+        <Form onSubmit={sendComment}>
+          <Form.Group>
+            <Form.Control value={comment} onChange={e => setComment(e.target.value)}/>
+          </Form.Group>
+          <Button variant="primary" type="submit">add comment</Button>
+        </Form>
+        <ListGroup variant="flush">
+          {blog.comments.map((comment, i) => <ListGroup.Item key={`${blog.id}-comment-${i}`}>{comment}</ListGroup.Item>)}
+        </ListGroup>
       </div>
     </div>
   );

@@ -1,16 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Table } from 'react-bootstrap';
 
 const UsersView = ({ users }) => {
   return (
     <div>
       <h2>Users</h2>
-      <table>
+      <Table striped bordered hover size="sm">
         <thead>
           <tr>
-            <th></th>
-            <th>blogs</th>
-            <th>created</th>
+            <th>Name</th>
+            <th>blogs created</th>
           </tr>
         </thead>
         <tbody>
@@ -21,7 +21,7 @@ const UsersView = ({ users }) => {
             </tr>
           )}
         </tbody>
-      </table>
+      </Table>
     </div>
   );
 };

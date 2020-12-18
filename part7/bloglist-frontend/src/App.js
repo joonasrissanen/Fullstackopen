@@ -6,6 +6,7 @@ import {
   Link,
   useRouteMatch,
 } from 'react-router-dom';
+import { Nav, Button } from 'react-bootstrap';
 import userService from './services/users';
 import Blog from './components/Blog';
 import LoginForm from './components/LoginForm';
@@ -48,14 +49,19 @@ const BlogListItem = ({ blog }) => {
   );
 };
 
-const Navigation = ({ loggedUserName, logout }) => {
+const Navigation = ({ logout }) => {
   return (
-    <div>
-      <Link to="/">blogs</Link>{' '}
-      <Link to="/users">users</Link>{' '}
-      {loggedUserName} logged in{' '}
-      <button onClick={logout}>logout</button>
-    </div>
+    <Nav as="ul">
+      <Nav.Item as="li">
+        <Nav.Link href="/">blogs</Nav.Link>
+      </Nav.Item>
+      <Nav.Item as="li">
+        <Nav.Link href="/users">users</Nav.Link>{' '}
+      </Nav.Item>
+      <Nav.Item as="li">
+        <Nav.Link onClick={logout}>logout</Nav.Link>
+      </Nav.Item>
+    </Nav>
   );
 };
 const App = (props) => {
@@ -99,12 +105,14 @@ const App = (props) => {
 
   if (!user) {
     return (
-      <div>
-        <h1>Log in to application</h1>
-        <Notification />
-        <Togglable buttonLabel='log in'>
-          <LoginForm />
-        </Togglable>
+      <div className="container">
+        <div className="justify-content-md-center">
+          <h2>Log in to application</h2>
+          <Notification />
+          <Togglable buttonLabel='log in'>
+            <LoginForm />
+          </Togglable>
+        </div>
       </div>
     );
 
@@ -114,29 +122,31 @@ const App = (props) => {
   const selectedBlog = blogsMatch ? sorted.find(b => b.id === blogsMatch.params.id) : null;
   const selectedUser = usersMatch ? usersList.find(u => u.id === usersMatch.params.id) : null;
   return (
-    <div>
-      <Navigation loggedUserName={user.name} logout={logout} />
-      <h2>blogs</h2>
-      <Notification />
-      <Switch>
-        <Route path="/blogs/:id">
-          <Blog blog={selectedBlog} likeBlog={like} deleteBlog={deleteBlog} />
-        </Route>
-        <Route path="/users/:id">
-          <User user={selectedUser} />
-        </Route>
-        <Route path="/users">
-          <UsersView users={usersList} />
-        </Route>
-        <Route path="/">
-          <Togglable buttonLabel='new blog'>
-            <BlogForm submitBlog={submitBlog} />
-          </Togglable>
-          <div id="blog-list">
-            {sorted.map(blog => <BlogListItem key={blog.id} blog={blog} />)}
-          </div>
-        </Route>
-      </Switch>
+    <div className="container">
+      <div className="justify-content-md-center">
+        <Navigation loggedUserName={user.name} logout={logout} />
+        <h2>blogs</h2>
+        <Notification />
+        <Switch>
+          <Route path="/blogs/:id">
+            <Blog blog={selectedBlog} likeBlog={like} deleteBlog={deleteBlog} />
+          </Route>
+          <Route path="/users/:id">
+            <User user={selectedUser} />
+          </Route>
+          <Route path="/users">
+            <UsersView users={usersList} />
+          </Route>
+          <Route path="/">
+            <Togglable buttonLabel='new blog'>
+              <BlogForm submitBlog={submitBlog} />
+            </Togglable>
+            <div id="blog-list">
+              {sorted.map(blog => <BlogListItem key={blog.id} blog={blog} />)}
+            </div>
+          </Route>
+        </Switch>
+      </div>
     </div>
   );
 };
