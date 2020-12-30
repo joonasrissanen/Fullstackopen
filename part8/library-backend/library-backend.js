@@ -74,20 +74,10 @@ const resolvers = {
     bookCount: () => Book.collection.countDocuments(),
     authorCount: () => Author.collection.countDocuments(),
     allBooks: async (root, args) => {
-      if(!args.genre) {
-        return Book.find({}).populate('author', { name: 1, born: 1, bookCount: 1})
-      }
-      // if (args.author && args.genre) {
-      //   Book.find({}).populate('author', { name: 1, born: 1, bookCount: 1})
-      // }
-      // if (args.author) {
-      //   return await Book.find({})
-      //     .populate('author', { name: 1, born: 1, bookCount: 1})
-      //     .where('author.name').equals(args.name)
-      // }
       if (args.genre) {
         return Book.find({ genres: { $in: [args.genre] }}).populate('author', { name: 1, born: 1, bookCount: 1})
       }
+      return Book.find({}).populate('author', { name: 1, born: 1, bookCount: 1})
     },
     allAuthors: () => Author.find({}),
   },
@@ -99,7 +89,12 @@ const resolvers = {
   },
   Mutation: {
     addBook: async (root, args, { currentUser }) => {
-      const book = new Book({ ...args })
+      let author = await Author.findOne({ name: args.author })
+      if (!author) {
+        author = new Author({ name: args.author })
+        await author.save()
+      }
+      const book = new Book({ ...args, author })
       if (!currentUser) {
         throw new AuthenticationError('not authenticated')
       }
