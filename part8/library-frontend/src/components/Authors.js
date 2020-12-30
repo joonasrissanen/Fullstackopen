@@ -1,27 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { gql, useQuery, useMutation } from '@apollo/client'
+import { useQuery, useMutation } from '@apollo/client'
+import { ALL_AUTHORS, EDIT_AUTHOR } from '../queries';
 
-const ALL_AUTHORS = gql`
-  query {
-    allAuthors {
-      name
-      born
-      bookCount
-      id
-    }
-  }
-`
-
-const EDIT_BORN = gql`
-  mutation editBorn($name: String!, $born: Int!) {
-    editBorn(name: $name, born: $born) {
-      name
-      born
-      bookCount
-      id
-    }
-  }
-`
 
 const Authors = (props) => {
   const result = useQuery(ALL_AUTHORS)
@@ -29,7 +9,7 @@ const Authors = (props) => {
   const [authors, setAuthors] = useState([])
   const [year, setYear] = useState('')
   const [error, setError] = useState('');
-  const [ changeBorn, resultBorn ] = useMutation(EDIT_BORN)
+  const [ changeBorn, resultBorn ] = useMutation(EDIT_AUTHOR)
   useEffect(() => {
     if (resultBorn.data && resultBorn.data.editBorn === null) {
       setError('Author not found')
