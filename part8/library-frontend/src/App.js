@@ -5,6 +5,7 @@ import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 import LoginForm from './components/LoginForm';
+import Recommend from './components/Recommend';
 
 const Notification = ({ message }) => {
   if ( !message ) {
@@ -21,6 +22,7 @@ const Notification = ({ message }) => {
 const App = () => {
   const [page, setPage] = useState('authors')
   const [token, setToken] = useState(null)
+
   const [errorMessage, setErrorMessage] = useState(null)
   const client = useApolloClient()
 
@@ -36,6 +38,7 @@ const App = () => {
       setPage('authors')
     }
   }, [token])
+
   const sendNotification = (message) => {
     setErrorMessage(message)
     setTimeout(() => {
@@ -80,6 +83,7 @@ const App = () => {
         setToken={setToken}
         setErrorMessage={sendNotification}
       />
+      <Recommend show={page === 'recommend'} />
     </div>
   )
 }
