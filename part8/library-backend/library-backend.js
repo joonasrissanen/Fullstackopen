@@ -80,6 +80,7 @@ const resolvers = {
       return Book.find({}).populate('author', { name: 1, born: 1, bookCount: 1})
     },
     allAuthors: () => Author.find({}),
+    me: (root, args, { currentUser }) => User.findById(currentUser.id)
   },
   Author: {
     bookCount: async (root) => {
