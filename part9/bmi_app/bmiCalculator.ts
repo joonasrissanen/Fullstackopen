@@ -11,37 +11,40 @@ const parseBmiArguments = (args: Array<string>): BmiValues  => {
     return {
       value1: Number(args[2]),
       value2: Number(args[3])
-    }
+    };
   } else {
     throw new Error('Provided values were not numbers!');
   }
-}
+};
 
 const calculateBmi = (height: number, weight: number): string => {
-  const bmi = weight / (Math.pow(height / 100, 2))
+  const bmi = weight / (Math.pow(height / 100, 2));
   if (bmi < 15) {
-    return 'Very severely underweight'
+    return 'Very severely underweight';
   } else if (bmi >= 15 && bmi < 16) {
-    return 'Severely underweight'
+    return 'Severely underweight';
   } else if (bmi >= 16 && bmi < 18.5) {
-    return 'Underweight'
+    return 'Underweight';
   } else if (bmi >= 18.5 && bmi < 25) {
-    return 'Normal (healthy weight)'
+    return 'Normal (healthy weight)';
   } else if (bmi >= 25 && bmi < 30) {
-    return 'Overweight'
+    return 'Overweight';
   } else if (bmi >= 30 && bmi < 35) {
-    return 'Obese Class I (Moderately obese)'
+    return 'Obese Class I (Moderately obese)';
   } else if (bmi >= 35 && bmi < 40) {
-    return 'Obese Class II (Severely obese)'
+    return 'Obese Class II (Severely obese)';
   } else {
-    return 'Obese Class III (Very severely obese)'
+    return 'Obese Class III (Very severely obese)';
   }
-}
+};
 
 try {
-  const { value1, value2 } = parseBmiArguments(process.argv);
+  const { value1, value2 }: BmiValues = parseBmiArguments(process.argv);
   const result: string = calculateBmi(value1, value2);
-  console.log(result)
+  console.log(result);
 } catch (e) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   console.log('Error, something bad happened, message: ', e.message);
 }
+
+export { calculateBmi };
