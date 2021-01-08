@@ -52,6 +52,7 @@ export const toNewPatientEntry = (object: any): NewPatientEntry => {
     ssn,
     gender,
     occupation,
+    entries: [],
   };
   return newEnry;
 };
