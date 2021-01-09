@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import React, { useEffect } from 'react';
 import axios from 'axios';
-import { useStateValue } from "../state";
+import { useStateValue, updatePatient } from "../state";
 import { Header, Icon } from "semantic-ui-react";
 import { useParams } from "react-router-dom";
 import { apiBaseUrl } from '../constants';
@@ -24,10 +24,10 @@ const PatientDetails: React.FC = () => {
   let patient: Patient | undefined = patients[id];
   useEffect(() => {
     if (!patient) {
-      axios.get(`${apiBaseUrl}/${id}`).then(response => {
+      axios.get<void>(`${apiBaseUrl}/${id}`).then(response => {
         const fetchedPatient = toPatientEntry(response.data);
         patient = fetchedPatient;
-        dispatch({ type: "UPDATE_PATIENT", payload: fetchedPatient });
+        dispatch(updatePatient(fetchedPatient));
       }).catch(e => {
         console.log(e);
       });
